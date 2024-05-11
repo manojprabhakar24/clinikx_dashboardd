@@ -22,77 +22,123 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        color: Colors.white,
-        child: Column(
-          children: [
-            Padding(
-              padding: EdgeInsets.all(12.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8.0),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.3),
-                      spreadRadius: 2,
-                      blurRadius: 4,
-                      offset: Offset(0, 2),
+      body: StreamBuilder(
+        stream: FirebaseFirestore.instance.collection('branches').snapshots(),
+        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return Center(
+              child: Text('No data available'),
+            );
+          }
+          var branchData =
+              (snapshot.data!.docs.first.data() as Map<String, dynamic>);
+          String branchName = branchData['clinicName'] ?? '';
+          String area = branchData['area'] ?? '';
+          String city = branchData['city'] ?? '';
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(right: 16.0),
+                      child: Image.asset(
+                        AppConfig.imagelogo,
+                        height: 60,
+                      ),
+                    ),
+                    Spacer(),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Branch Name: ${branchName ?? 'N/A'}',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          'Area: ${area ?? 'N/A'}',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          'City: ${city ?? 'N/A'}',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-                child: AppBar(
-                  backgroundColor: Colors.transparent,
-                  elevation: 0,
-                  title: Row(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(right: 16.0),
-                        child: Image.asset(
-                          AppConfig.imagelogo,
-                          height: 60,
-                        ),
-                      ),
-                      _buildMenuItem('Branch Manage'),
-                      _buildMenuItem('Staff Manage'),
-                      _buildMenuItem('Appointments'),
-                      _buildMenuItem('Patients'),
-                      _buildMenuItem('Subscription'),
-                      Spacer(),
-                      IconButton(
-                        icon: Icon(Icons.person),
-                        onPressed: () {
-                          // Navigate to profile page
-                        },
-                      ),
-                      Text("Admin")
-                    ],
-                  ),
+              ),
+              Divider(
+                // Add a divider for separation
+                height: 1,
+                color: Colors.grey,
+              ),
+              AppBar(
+                backgroundColor: Colors.grey.shade50,
+                elevation: 0,
+                title: Row(
+                  children: [
+                    _buildMenuItem('Branch Manage'),
+                    _buildMenuItem('Staff Manage'),
+                    _buildMenuItem('Appointments'),
+                    _buildMenuItem('Patients'),
+                    _buildMenuItem('Subscription'),
+                    Spacer(),
+
+                    SizedBox(width: 16),
+                    Text("Powered by",
+                        style: TextStyle(color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14
+                        )),// Add some spacing between Admin text and logo
+                    Image.asset(
+                      AppConfig.matrical,
+                      height: 150,
+                    ),
+                  ],
                 ),
               ),
-            ),
-            Expanded(
-              child: selectedItem == 'Branch Manage'
-                  ? _buildBranchDataTable()
-                  : SizedBox(),
-            ),
-            // Image at the bottom
-            SizedBox(
-              width: double.infinity,
-              child: Align(
-                alignment: Alignment.bottomLeft, // Changed alignment here
-                child: Container(
-                  padding: EdgeInsets.all(16.0),
-                  color: Colors.transparent,
+              Expanded(
+                child: selectedItem == 'Branch Manage'
+                    ? _buildBranchDataTable()
+                    : SizedBox(),
+              ),
+              SizedBox(height: 16),
+              // Add some spacing between the table and the image
+              // Add your image here
+              Container(
+                child: Align(
+                  alignment: Alignment.bottomRight,
                   child: Image.asset(
-                    AppConfig.contact,
-                    height: 50, // Adjust the height as needed
+                    AppConfig.contact, // Replace 'your_image.png' with your image path
+                    height: 80, // Adjust the height as needed
+                    width: 250, // Adjust the width as needed
+                    // Adjust the fit as needed
                   ),
                 ),
               ),
-            ),
-          ],
-        ),
+            ],
+
+
+          );
+        },
       ),
     );
   }
@@ -142,10 +188,7 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: SizedBox(
-                width: MediaQuery
-                    .of(context)
-                    .size
-                    .width,
+                width: MediaQuery.of(context).size.width,
                 child: DataTable(
                   headingTextStyle: TextStyle(
                     fontWeight: FontWeight.bold,
@@ -270,16 +313,22 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
     );
   }
 
-  void _showBranchDetailsPopup(BuildContext context, String branchName,
-      String city, String area, String state, String mobileNumber,
-      String branchId, String status) {
-    TextEditingController nameController = TextEditingController(
-        text: branchName);
+  void _showBranchDetailsPopup(
+      BuildContext context,
+      String branchName,
+      String city,
+      String area,
+      String state,
+      String mobileNumber,
+      String branchId,
+      String status) {
+    TextEditingController nameController =
+        TextEditingController(text: branchName);
     TextEditingController areaController = TextEditingController(text: area);
     TextEditingController cityController = TextEditingController(text: city);
     TextEditingController stateController = TextEditingController(text: state);
-    TextEditingController mobileController = TextEditingController(
-        text: mobileNumber);
+    TextEditingController mobileController =
+        TextEditingController(text: mobileNumber);
     TextEditingController govIdController = TextEditingController();
     TextEditingController fromTimeController = TextEditingController();
     TextEditingController toTimeController = TextEditingController();
@@ -287,8 +336,11 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
     GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
     // Fetch all branch details from Firestore
-    FirebaseFirestore.instance.collection('branches').doc(branchId).get().then((
-        doc) {
+    FirebaseFirestore.instance
+        .collection('branches')
+        .doc(branchId)
+        .get()
+        .then((doc) {
       if (doc.exists) {
         setState(() {
           nameController.text = doc['clinicName'] ?? '';
@@ -316,7 +368,7 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
             padding: EdgeInsets.all(16.0),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Colors.purple, Colors.purpleAccent],
+                colors: [Colors.greenAccent, Colors.purpleAccent],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
@@ -493,7 +545,8 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter the timings from';
                               }
-                              String pattern = r'^(1[0-2]|0?[1-9]):([0-5][0-9]) ([APap][mM])$';
+                              String pattern =
+                                  r'^(1[0-2]|0?[1-9]):([0-5][0-9]) ([APap][mM])$';
                               RegExp regex = RegExp(pattern);
                               if (!regex.hasMatch(value)) {
                                 return 'Invalid timings format. Please use hh:mm AM/PM';
@@ -519,7 +572,8 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter the timings to';
                               }
-                              String pattern = r'^(1[0-2]|0?[1-9]):([0-5][0-9]) ([APap][mM])$';
+                              String pattern =
+                                  r'^(1[0-2]|0?[1-9]):([0-5][0-9]) ([APap][mM])$';
                               RegExp regex = RegExp(pattern);
                               if (!regex.hasMatch(value)) {
                                 return 'Invalid timings format. Please use hh:mm AM/PM';
@@ -550,8 +604,10 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
                           onPressed: () {
                             if (_formKey.currentState!.validate()) {
                               // Update branch details in Firestore
-                              FirebaseFirestore.instance.collection('branches')
-                                  .doc(branchId).update({
+                              FirebaseFirestore.instance
+                                  .collection('branches')
+                                  .doc(branchId)
+                                  .update({
                                 'clinicName': nameController.text,
                                 'area': areaController.text,
                                 'city': cityController.text,
@@ -560,23 +616,26 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
                                 'govIdNumber': govIdController.text,
                                 'timingFrom': fromTimeController.text,
                                 'timingTo': toTimeController.text,
-                              })
-                                  .then((_) {
+                              }).then((_) {
                                 // Update status from 'BP' to 'PA'
-                                return FirebaseFirestore.instance.collection(
-                                    'branches').doc(branchId).update({
+                                return FirebaseFirestore.instance
+                                    .collection('branches')
+                                    .doc(branchId)
+                                    .update({
                                   'status': 'PA',
                                 });
                               }).then((_) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text(
-                                      'Data updated successfully')),
+                                  SnackBar(
+                                      content:
+                                          Text('Data updated successfully')),
                                 );
                                 Navigator.of(context).pop();
                               }).catchError((error) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text(
-                                      'Failed to update data: $error')),
+                                  SnackBar(
+                                      content: Text(
+                                          'Failed to update data: $error')),
                                 );
                               });
                             }
