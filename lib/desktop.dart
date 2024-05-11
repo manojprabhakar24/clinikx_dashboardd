@@ -1,9 +1,9 @@
-import 'dart:typed_data';
-import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:image_picker/image_picker.dart';
 
+
+import 'Addstaff.dart';
 import 'config.dart';
 
 class DesktopDashboard extends StatefulWidget {
@@ -149,6 +149,13 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
         setState(() {
           selectedItem = title;
         });
+        if (selectedItem == 'Staff Manage') {
+          // Open the StaffDetailsForm
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => StaffDetailsForm()),
+          );
+        }
       },
       child: Text(
         title,
@@ -159,6 +166,7 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
       ),
     );
   }
+
 
   Widget _buildBranchDataTable() {
     return StreamBuilder(
