@@ -1,10 +1,13 @@
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 import 'Addstaff.dart';
 import 'config.dart';
+import 'dart:io'; // Add this import for File class
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage; // Add this import for Firebase Storage
+import 'package:image_picker/image_picker.dart';  // Add this import for ImagePicker
 
 class DesktopDashboard extends StatefulWidget {
   @override
@@ -14,11 +17,21 @@ class DesktopDashboard extends StatefulWidget {
 class _DesktopDashboardState extends State<DesktopDashboard> {
   String selectedItem = '';
   String selectedBranchName = '';
+  File? _selectedImageFile;
   Map<String, String> statusFullForms = {
     'BP': 'Branch Pending',
     'PA': 'Pending Approval',
   };
-
+  Widget _buildImagePreview() {
+    return _selectedImageFile != null
+        ? Image.file(
+      _selectedImageFile!,
+      height: 150, // Adjust the height as needed
+      width: 150, // Adjust the width as needed
+      fit: BoxFit.cover, // Adjust the fit as needed
+    )
+        : SizedBox();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,7 +49,7 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
             );
           }
           var branchData =
-              (snapshot.data!.docs.first.data() as Map<String, dynamic>);
+          (snapshot.data!.docs.first.data() as Map<String, dynamic>);
           String branchName = branchData['clinicName'] ?? '';
           String area = branchData['area'] ?? '';
           String city = branchData['city'] ?? '';
@@ -321,6 +334,7 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
     );
   }
 
+
   void _showBranchDetailsPopup(
       BuildContext context,
       String branchName,
@@ -331,17 +345,20 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
       String branchId,
       String status) {
     TextEditingController nameController =
-        TextEditingController(text: branchName);
+    TextEditingController(text: branchName);
     TextEditingController areaController = TextEditingController(text: area);
     TextEditingController cityController = TextEditingController(text: city);
     TextEditingController stateController = TextEditingController(text: state);
     TextEditingController mobileController =
-        TextEditingController(text: mobileNumber);
+    TextEditingController(text: mobileNumber);
     TextEditingController govIdController = TextEditingController();
     TextEditingController fromTimeController = TextEditingController();
     TextEditingController toTimeController = TextEditingController();
+    TextEditingController documentController = TextEditingController(); // Define documentController here
+
 
     GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
 
     // Fetch all branch details from Firestore
     FirebaseFirestore.instance
@@ -563,6 +580,42 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
                             },
                           ),
                           SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextFormField(
+                                  controller: documentController,
+                                  readOnly: true, // Make it read-only to prevent user input
+                                  decoration: InputDecoration(
+                                    labelText: 'Document',
+                                    labelStyle: TextStyle(color: Colors.white),
+                                    border: OutlineInputBorder(
+                                      borderSide: BorderSide(color: Colors.white),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(color: Colors.white),
+                                    ),
+                                    suffixIcon: IconButton(
+                                      onPressed: () async {
+                                        final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+                                        if (pickedFile != null) {
+                                          setState(() {
+                                            _selectedImageFile = File(pickedFile.path);
+                                            documentController.text = _selectedImageFile!.path.split('/').last; // Display file name in the text field
+                                          });
+                                        }
+                                      },
+                                      icon: Icon(Icons.upload),
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  style: TextStyle(color: Colors.white),
+                                  enabled: status == 'PA',
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 16),
                           TextFormField(
                             controller: toTimeController,
                             decoration: InputDecoration(
@@ -592,6 +645,9 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
                         ],
                       ),
                     ),
+
+
+
                     SizedBox(height: 16),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -636,7 +692,7 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                       content:
-                                          Text('Data updated successfully')),
+                                      Text('Data updated successfully')),
                                 );
                                 Navigator.of(context).pop();
                               }).catchError((error) {
