@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 
+import 'Addstaff.dart';
 import 'config.dart';
 
 
@@ -150,6 +151,13 @@ class _TabletDashboardState extends State<TabletDashboard> {
         setState(() {
           selectedItem = title;
         });
+        if (selectedItem == 'Staff Manage') {
+          // Open the StaffDetailsForm
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => StaffDetailsForm()),
+          );
+        }
       },
       child: Text(
         title,
@@ -160,6 +168,7 @@ class _TabletDashboardState extends State<TabletDashboard> {
       ),
     );
   }
+
 
   Widget _buildBranchDataTable() {
     return StreamBuilder(
@@ -356,6 +365,7 @@ class _TabletDashboardState extends State<TabletDashboard> {
       }
     });
 
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -364,18 +374,14 @@ class _TabletDashboardState extends State<TabletDashboard> {
             borderRadius: BorderRadius.circular(16.0),
           ),
           elevation: 0.0,
-          backgroundColor: Colors.transparent,
+          backgroundColor: Colors.grey[200],
           child: Container(
             padding: EdgeInsets.all(16.0),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.greenAccent, Colors.purpleAccent],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
+              border: Border.all(color: Colors.purple, width: 2), // Purple outline
               borderRadius: BorderRadius.circular(16.0),
             ),
-            constraints: BoxConstraints(maxWidth: 400),
+            constraints: BoxConstraints(maxWidth: 550, maxHeight: 500),
             child: SingleChildScrollView(
               child: Form(
                 key: _formKey,
@@ -384,13 +390,11 @@ class _TabletDashboardState extends State<TabletDashboard> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      status == 'PA'
-                          ? 'Edit Branch Details'
-                          : 'View Branch Details',
+                      status == 'PA' ? 'Edit Branch Details' : 'View Branch Details',
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: Colors.black,
                       ),
                     ),
                     SizedBox(height: 16),
@@ -398,15 +402,15 @@ class _TabletDashboardState extends State<TabletDashboard> {
                       controller: nameController,
                       decoration: InputDecoration(
                         labelText: 'Branch Name',
-                        labelStyle: TextStyle(color: Colors.white),
+                        labelStyle: TextStyle(color: Colors.black),
                         border: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
+                          borderSide: BorderSide(color: Colors.purple), // Purple outline
                         ),
                         enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
+                          borderSide: BorderSide(color: Colors.purple), // Purple outline
                         ),
                       ),
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Colors.black),
                       enabled: status == 'PA',
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -416,19 +420,20 @@ class _TabletDashboardState extends State<TabletDashboard> {
                       },
                     ),
                     SizedBox(height: 16),
+                    SizedBox(height: 16),
                     TextFormField(
                       controller: areaController,
                       decoration: InputDecoration(
                         labelText: 'Area',
-                        labelStyle: TextStyle(color: Colors.white),
+                        labelStyle: TextStyle(color: Colors.black),
                         border: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
+                          borderSide: BorderSide(color: Colors.purple), // Purple outline
                         ),
                         enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
+                          borderSide: BorderSide(color: Colors.purple), // Purple outline
                         ),
                       ),
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Colors.black),
                       enabled: status == 'PA',
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -442,15 +447,15 @@ class _TabletDashboardState extends State<TabletDashboard> {
                       controller: cityController,
                       decoration: InputDecoration(
                         labelText: 'City',
-                        labelStyle: TextStyle(color: Colors.white),
+                        labelStyle: TextStyle(color: Colors.black),
                         border: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
+                          borderSide: BorderSide(color: Colors.purple),
                         ),
                         enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
+                          borderSide: BorderSide(color: Colors.purple),
                         ),
                       ),
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Colors.black),
                       enabled: status == 'PA',
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -464,15 +469,15 @@ class _TabletDashboardState extends State<TabletDashboard> {
                       controller: stateController,
                       decoration: InputDecoration(
                         labelText: 'State',
-                        labelStyle: TextStyle(color: Colors.white),
+                        labelStyle: TextStyle(color: Colors.black),
                         border: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
+                          borderSide: BorderSide(color: Colors.purple),
                         ),
                         enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
+                          borderSide: BorderSide(color: Colors.purple),
                         ),
                       ),
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Colors.black),
                       enabled: status == 'PA',
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -486,15 +491,15 @@ class _TabletDashboardState extends State<TabletDashboard> {
                       controller: mobileController,
                       decoration: InputDecoration(
                         labelText: 'Mobile Number',
-                        labelStyle: TextStyle(color: Colors.white),
+                        labelStyle: TextStyle(color: Colors.black),
                         border: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
+                          borderSide: BorderSide(color: Colors.purple),
                         ),
                         enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
+                          borderSide: BorderSide(color: Colors.purple),
                         ),
                       ),
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Colors.black),
                       enabled: status == 'PA',
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -512,15 +517,15 @@ class _TabletDashboardState extends State<TabletDashboard> {
                             controller: govIdController,
                             decoration: InputDecoration(
                               labelText: 'Government ID Number',
-                              labelStyle: TextStyle(color: Colors.white),
+                              labelStyle: TextStyle(color: Colors.black),
                               border: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.white),
+                                borderSide: BorderSide(color: Colors.purple),
                               ),
                               enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.white),
+                                borderSide: BorderSide(color: Colors.purple),
                               ),
                             ),
-                            style: TextStyle(color: Colors.white),
+                            style: TextStyle(color: Colors.black),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter the government ID number';
@@ -533,15 +538,15 @@ class _TabletDashboardState extends State<TabletDashboard> {
                             controller: fromTimeController,
                             decoration: InputDecoration(
                               labelText: 'Timings From',
-                              labelStyle: TextStyle(color: Colors.white),
+                              labelStyle: TextStyle(color: Colors.black),
                               border: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.white),
+                                borderSide: BorderSide(color: Colors.purple),
                               ),
                               enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.white),
+                                borderSide: BorderSide(color: Colors.purple),
                               ),
                             ),
-                            style: TextStyle(color: Colors.white),
+                            style: TextStyle(color: Colors.black),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter the timings from';
@@ -560,15 +565,15 @@ class _TabletDashboardState extends State<TabletDashboard> {
                             controller: toTimeController,
                             decoration: InputDecoration(
                               labelText: 'Timings To',
-                              labelStyle: TextStyle(color: Colors.white),
+                              labelStyle: TextStyle(color: Colors.black),
                               border: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.white),
+                                borderSide: BorderSide(color: Colors.purple),
                               ),
                               enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.white),
+                                borderSide: BorderSide(color: Colors.purple),
                               ),
                             ),
-                            style: TextStyle(color: Colors.white),
+                            style: TextStyle(color: Colors.black),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter the timings to';
@@ -598,7 +603,7 @@ class _TabletDashboardState extends State<TabletDashboard> {
                             style: TextStyle(fontSize: 18),
                           ),
                           style: ElevatedButton.styleFrom(
-                            primary: Colors.red,
+                            primary: Colors.white,
                           ),
                         ),
                         ElevatedButton(
@@ -646,8 +651,8 @@ class _TabletDashboardState extends State<TabletDashboard> {
                             style: TextStyle(fontSize: 18),
                           ),
                           style: ElevatedButton.styleFrom(
-                            primary: Colors.white,
-                            onPrimary: Colors.grey,
+                            primary: Colors.purple,
+                            onPrimary: Colors.white,
                           ),
                         ),
                       ],

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 
+import 'Addstaff.dart';
 import 'config.dart';
 
 class MobileDashboard extends StatefulWidget {
@@ -28,7 +29,7 @@ class _MobileDashboardState extends State<MobileDashboard> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: Colors.purpleAccent,
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.menu),
@@ -96,6 +97,8 @@ class _MobileDashboardState extends State<MobileDashboard> {
   Widget _buildBody() {
     if (selectedItem == 'Branch Manage') {
       return _buildBranchDataTable();
+    } else if (selectedItem == 'Staff Manage') {
+      return StaffDetailsForm(); // Display Staff Details Form
     } else {
       return Center(
         child: Text('Select an item from the drawer to view details.'),

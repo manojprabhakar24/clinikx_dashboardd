@@ -1,6 +1,11 @@
+import 'dart:html' as html;
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:io' as io;
+
 
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:image_picker/image_picker.dart';
 
 
 import 'Addstaff.dart';
@@ -12,12 +17,27 @@ class DesktopDashboard extends StatefulWidget {
 }
 
 class _DesktopDashboardState extends State<DesktopDashboard> {
+  XFile? _image;
+// Declare _image as String to hold the file path
+
+  final picker = ImagePicker();
   String selectedItem = '';
   String selectedBranchName = '';
   Map<String, String> statusFullForms = {
     'BP': 'Branch Pending',
     'PA': 'Pending Approval',
   };
+  Future getImage() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    setState(() {
+      _image = pickedFile; // Store the picked file directly
+      if (_image == null) {
+        print('No image selected.');
+      }
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +56,7 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
             );
           }
           var branchData =
-              (snapshot.data!.docs.first.data() as Map<String, dynamic>);
+          (snapshot.data!.docs.first.data() as Map<String, dynamic>);
           String branchName = branchData['clinicName'] ?? '';
           String area = branchData['area'] ?? '';
           String city = branchData['city'] ?? '';
@@ -55,6 +75,7 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
                         height: 60,
                       ),
                     ),
+
                     Spacer(),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -107,7 +128,7 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
                         style: TextStyle(color: Colors.black,
                             fontWeight: FontWeight.bold,
                             fontSize: 14
-                        )),// Add some spacing between Admin text and logo
+                        )), // Add some spacing between Admin text and logo
                     Image.asset(
                       AppConfig.matrical,
                       height: 150,
@@ -127,7 +148,8 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
                 child: Align(
                   alignment: Alignment.bottomRight,
                   child: Image.asset(
-                    AppConfig.contact, // Replace 'your_image.png' with your image path
+                    AppConfig.contact,
+                    // Replace 'your_image.png' with your image path
                     height: 80, // Adjust the height as needed
                     width: 250, // Adjust the width as needed
                     // Adjust the fit as needed
@@ -196,7 +218,10 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: SizedBox(
-                width: MediaQuery.of(context).size.width,
+                width: MediaQuery
+                    .of(context)
+                    .size
+                    .width,
                 child: DataTable(
                   headingTextStyle: TextStyle(
                     fontWeight: FontWeight.bold,
@@ -321,8 +346,7 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
     );
   }
 
-  void _showBranchDetailsPopup(
-      BuildContext context,
+  void _showBranchDetailsPopup(BuildContext context,
       String branchName,
       String city,
       String area,
@@ -330,20 +354,22 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
       String mobileNumber,
       String branchId,
       String status) {
-    TextEditingController nameController =
-        TextEditingController(text: branchName);
+    TextEditingController nameController = TextEditingController(
+        text: branchName);
     TextEditingController areaController = TextEditingController(text: area);
     TextEditingController cityController = TextEditingController(text: city);
     TextEditingController stateController = TextEditingController(text: state);
-    TextEditingController mobileController =
-        TextEditingController(text: mobileNumber);
+    TextEditingController mobileController = TextEditingController(
+        text: mobileNumber);
     TextEditingController govIdController = TextEditingController();
     TextEditingController fromTimeController = TextEditingController();
     TextEditingController toTimeController = TextEditingController();
 
     GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-    // Fetch all branch details from Firestore
+
+
+
     FirebaseFirestore.instance
         .collection('branches')
         .doc(branchId)
@@ -371,24 +397,21 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
             borderRadius: BorderRadius.circular(16.0),
           ),
           elevation: 0.0,
-          backgroundColor: Colors.transparent,
+          backgroundColor: Colors.grey[200],
           child: Container(
             padding: EdgeInsets.all(16.0),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.greenAccent, Colors.purpleAccent],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
+              border: Border.all(color: Colors.purple, width: 2),
               borderRadius: BorderRadius.circular(16.0),
             ),
-            constraints: BoxConstraints(maxWidth: 400),
+            constraints: BoxConstraints(maxWidth: 800), // Adjust the width here
             child: SingleChildScrollView(
               child: Form(
                 key: _formKey,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
                       status == 'PA'
@@ -397,137 +420,185 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: Colors.black,
                       ),
                     ),
                     SizedBox(height: 16),
-                    TextFormField(
-                      controller: nameController,
-                      decoration: InputDecoration(
-                        labelText: 'Branch Name',
-                        labelStyle: TextStyle(color: Colors.white),
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
+                    Row(
+                      children: [
+                        GestureDetector(
+                          onTap: getImage,
+                          child: Container(
+                            width: 250,
+                            // Adjust the width of the image container
+                            height: 350,
+                            // Adjust the height of the image container
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.purple),
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            child: Center(
+                              child: _image == null
+                                  ? Icon(Icons.add_photo_alternate_outlined,
+                                  color: Colors.purple, size: 100)
+                                  : kIsWeb
+                                  ? Image.memory(io.File(_image!.path).readAsBytesSync())
+                                  : Image.file(io.File(_image!.path)),
+
+
+
+                            ),
+                          ),
                         ),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
+                        SizedBox(width: 20),
+                        // Add spacing between image and text fields
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              TextFormField(
+                                controller: nameController,
+                                decoration: InputDecoration(
+                                  labelText: 'Branch Name',
+                                  labelStyle: TextStyle(color: Colors.black),
+                                  border: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Colors.purple),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Colors.purple),
+                                  ),
+                                ),
+                                style: TextStyle(color: Colors.black),
+                                enabled: status == 'PA',
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter the branch name';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              SizedBox(height: 16),
+                              TextFormField(
+                                controller: areaController,
+                                decoration: InputDecoration(
+                                  labelText: 'Area',
+                                  labelStyle: TextStyle(color: Colors.black),
+                                  border: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Colors.purple),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Colors.purple),
+                                  ),
+                                ),
+                                style: TextStyle(color: Colors.black),
+                                enabled: status == 'PA',
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter the area';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              SizedBox(height: 16),
+                              TextFormField(
+                                controller: cityController,
+                                decoration: InputDecoration(
+                                  labelText: 'City',
+                                  labelStyle: TextStyle(color: Colors.black),
+                                  border: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Colors.purple),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Colors.purple),
+                                  ),
+                                ),
+                                style: TextStyle(color: Colors.black),
+                                enabled: status == 'PA',
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter the city';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              SizedBox(height: 16),
+                              TextFormField(
+                                controller: stateController,
+                                decoration: InputDecoration(
+                                  labelText: 'State',
+                                  labelStyle: TextStyle(color: Colors.black),
+                                  border: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Colors.purple),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Colors.purple),
+                                  ),
+                                ),
+                                style: TextStyle(color: Colors.black),
+                                enabled: status == 'PA',
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter the state';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              SizedBox(height: 16),
+                              TextFormField(
+                                controller: mobileController,
+                                decoration: InputDecoration(
+                                  labelText: 'Mobile Number',
+                                  labelStyle: TextStyle(color: Colors.black),
+                                  border: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Colors.purple),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Colors.purple),
+                                  ),
+                                ),
+                                style: TextStyle(color: Colors.black),
+                                enabled: status == 'PA',
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter the mobile number';
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      style: TextStyle(color: Colors.white),
-                      enabled: status == 'PA',
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter the branch name';
-                        }
-                        return null;
-                      },
-                    ),
-                    SizedBox(height: 16),
-                    TextFormField(
-                      controller: areaController,
-                      decoration: InputDecoration(
-                        labelText: 'Area',
-                        labelStyle: TextStyle(color: Colors.white),
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                      ),
-                      style: TextStyle(color: Colors.white),
-                      enabled: status == 'PA',
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter the area';
-                        }
-                        return null;
-                      },
-                    ),
-                    SizedBox(height: 16),
-                    TextFormField(
-                      controller: cityController,
-                      decoration: InputDecoration(
-                        labelText: 'City',
-                        labelStyle: TextStyle(color: Colors.white),
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                      ),
-                      style: TextStyle(color: Colors.white),
-                      enabled: status == 'PA',
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter the city';
-                        }
-                        return null;
-                      },
-                    ),
-                    SizedBox(height: 16),
-                    TextFormField(
-                      controller: stateController,
-                      decoration: InputDecoration(
-                        labelText: 'State',
-                        labelStyle: TextStyle(color: Colors.white),
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                      ),
-                      style: TextStyle(color: Colors.white),
-                      enabled: status == 'PA',
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter the state';
-                        }
-                        return null;
-                      },
-                    ),
-                    SizedBox(height: 16),
-                    TextFormField(
-                      controller: mobileController,
-                      decoration: InputDecoration(
-                        labelText: 'Mobile Number',
-                        labelStyle: TextStyle(color: Colors.white),
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                      ),
-                      style: TextStyle(color: Colors.white),
-                      enabled: status == 'PA',
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter the mobile number';
-                        }
-                        return null;
-                      },
+                      ],
                     ),
                     SizedBox(height: 16),
                     Visibility(
                       visible: status == 'BP',
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           TextFormField(
                             controller: govIdController,
                             decoration: InputDecoration(
                               labelText: 'Government ID Number',
-                              labelStyle: TextStyle(color: Colors.white),
+                              labelStyle: TextStyle(color: Colors.black),
                               border: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.white),
+                                borderSide: BorderSide(color: Colors.purple),
                               ),
                               enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.white),
+                                borderSide: BorderSide(color: Colors.purple),
                               ),
                             ),
-                            style: TextStyle(color: Colors.white),
+                            style: TextStyle(color: Colors.black),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter the government ID number';
@@ -540,21 +611,20 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
                             controller: fromTimeController,
                             decoration: InputDecoration(
                               labelText: 'Timings From',
-                              labelStyle: TextStyle(color: Colors.white),
+                              labelStyle: TextStyle(color: Colors.black),
                               border: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.white),
+                                borderSide: BorderSide(color: Colors.purple),
                               ),
                               enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.white),
+                                borderSide: BorderSide(color: Colors.purple),
                               ),
                             ),
-                            style: TextStyle(color: Colors.white),
+                            style: TextStyle(color: Colors.black),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter the timings from';
                               }
-                              String pattern =
-                                  r'^(1[0-2]|0?[1-9]):([0-5][0-9]) ([APap][mM])$';
+                              String pattern = r'^(1[0-2]|0?[1-9]):([0-5][0-9]) ([APap][mM])$';
                               RegExp regex = RegExp(pattern);
                               if (!regex.hasMatch(value)) {
                                 return 'Invalid timings format. Please use hh:mm AM/PM';
@@ -567,21 +637,20 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
                             controller: toTimeController,
                             decoration: InputDecoration(
                               labelText: 'Timings To',
-                              labelStyle: TextStyle(color: Colors.white),
+                              labelStyle: TextStyle(color: Colors.black),
                               border: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.white),
+                                borderSide: BorderSide(color: Colors.purple),
                               ),
                               enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.white),
+                                borderSide: BorderSide(color: Colors.purple),
                               ),
                             ),
-                            style: TextStyle(color: Colors.white),
+                            style: TextStyle(color: Colors.black),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter the timings to';
                               }
-                              String pattern =
-                                  r'^(1[0-2]|0?[1-9]):([0-5][0-9]) ([APap][mM])$';
+                              String pattern = r'^(1[0-2]|0?[1-9]):([0-5][0-9]) ([APap][mM])$';
                               RegExp regex = RegExp(pattern);
                               if (!regex.hasMatch(value)) {
                                 return 'Invalid timings format. Please use hh:mm AM/PM';
@@ -605,13 +674,12 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
                             style: TextStyle(fontSize: 18),
                           ),
                           style: ElevatedButton.styleFrom(
-                            primary: Colors.red,
+                            primary: Colors.white,
                           ),
                         ),
                         ElevatedButton(
                           onPressed: () {
                             if (_formKey.currentState!.validate()) {
-                              // Update branch details in Firestore
                               FirebaseFirestore.instance
                                   .collection('branches')
                                   .doc(branchId)
@@ -625,7 +693,6 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
                                 'timingFrom': fromTimeController.text,
                                 'timingTo': toTimeController.text,
                               }).then((_) {
-                                // Update status from 'BP' to 'PA'
                                 return FirebaseFirestore.instance
                                     .collection('branches')
                                     .doc(branchId)
@@ -635,15 +702,16 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
                               }).then((_) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                      content:
-                                          Text('Data updated successfully')),
+                                    content: Text('Data updated successfully'),
+                                  ),
                                 );
                                 Navigator.of(context).pop();
                               }).catchError((error) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                      content: Text(
-                                          'Failed to update data: $error')),
+                                    content: Text(
+                                        'Failed to update data: $error'),
+                                  ),
                                 );
                               });
                             }
@@ -653,8 +721,8 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
                             style: TextStyle(fontSize: 18),
                           ),
                           style: ElevatedButton.styleFrom(
-                            primary: Colors.white,
-                            onPrimary: Colors.grey,
+                            primary: Colors.purple,
+                            onPrimary: Colors.white,
                           ),
                         ),
                       ],
