@@ -19,6 +19,26 @@ class _MobileDashboardState extends State<MobileDashboard> {
   TextEditingController govIdController = TextEditingController();
   TextEditingController fromTimeController = TextEditingController();
   TextEditingController toTimeController = TextEditingController();
+  ScrollController _scrollController = ScrollController();
+  double appBarElevation = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_scrollListener);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_scrollListener);
+    super.dispose();
+  }
+
+  void _scrollListener() {
+    setState(() {
+      appBarElevation = _scrollController.offset > 0 ? 4.0 : 0.0;
+    });
+  }
   Future<Uint8List?> pickImage(ImageSource source) async {
     final ImagePicker _imagePicker = ImagePicker();
     XFile? _file = await _imagePicker.pickImage(source: source, imageQuality: 50);
@@ -39,27 +59,57 @@ class _MobileDashboardState extends State<MobileDashboard> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      appBar: AppBar(
-        backgroundColor: Colors.purpleAccent,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.menu),
-          color: Colors.white,
-          onPressed: () => _scaffoldKey.currentState!.openDrawer(),
-        ),
-        title: Text(
-          'Welcome Admin',
-          style: TextStyle(color: Colors.white),
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.person),
-            color: Colors.white,
-            onPressed: () {
-              // Navigate to profile page
-            },
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(kToolbarHeight),
+        child: AnimatedContainer(
+          duration: Duration(milliseconds: 300),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.purpleAccent, Colors.deepPurple],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.3),
+                blurRadius: appBarElevation,
+              ),
+            ],
           ),
-        ],
+          child: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            leading: Builder(
+              builder: (BuildContext context) {
+                return IconButton(
+                  icon: Icon(Icons.menu),
+                  onPressed: () => Scaffold.of(context).openDrawer(),
+                );
+              },
+            ),
+
+            title: AnimatedOpacity(
+              opacity: appBarElevation > 0 ? 1.0 : 0.0,
+              duration: Duration(milliseconds: 300),
+              child: Text(
+                'Welcome Admin',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            actions: [
+              IconButton(
+                icon: Icon(Icons.person),
+                onPressed: () {
+                  // Navigate to profile page
+                },
+              ),
+            ],
+          ),
+        ),
       ),
       body: _buildBody(),
       drawer: _buildDrawer(),
@@ -112,10 +162,15 @@ class _MobileDashboardState extends State<MobileDashboard> {
       return StaffDetailsForm(); // Display Staff Details Form
     } else {
       return Center(
-        child: Text('Select an item from the drawer to view details.'),
+        child: Image.asset(
+          AppConfig.imagelogo, // Replace 'assets/company_logo.png' with your actual image path
+          width: 200, // Adjust the width as needed
+          height: 200, // Adjust the height as needed
+        ),
       );
     }
   }
+
 
   Widget _buildBranchDataTable() {
     return StreamBuilder(

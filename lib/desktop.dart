@@ -1,5 +1,5 @@
-import 'dart:html' as html;
-import 'package:flutter/foundation.dart' show kIsWeb;
+
+
 import 'dart:io' as io;
 
 
@@ -71,7 +71,6 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
                         height: 60,
                       ),
                     ),
-
                     Spacer(),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -118,13 +117,15 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
                     _buildMenuItem('Patients'),
                     _buildMenuItem('Subscription'),
                     Spacer(),
-
                     SizedBox(width: 16),
-                    Text("Powered by",
-                        style: TextStyle(color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14
-                        )), // Add some spacing between Admin text and logo
+                    Text(
+                      "Powered by",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ), // Add some spacing between Admin text and logo
                     Image.asset(
                       AppConfig.matrical,
                       height: 150,
@@ -132,6 +133,28 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
                   ],
                 ),
               ),
+              // Display Branch with icon if Branch Manage is selected
+              if (selectedItem == 'Branch Manage')
+                Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      // Icon
+
+                      Text(
+                        'Branch',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Icon(Icons.store, size: 20, color: Colors.purple),
+                      // Text
+                    ],
+                  ),
+                ),
               Expanded(
                 child: selectedItem == 'Branch Manage'
                     ? _buildBranchDataTable()
@@ -153,9 +176,8 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
                 ),
               ),
             ],
-
-
           );
+
         },
       ),
     );
@@ -437,7 +459,7 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
                               child: _image == null
                                   ? Icon(Icons.add_photo_alternate_outlined,
                                   color: Colors.purple, size: 100)
-                                  : kIsWeb
+                                  : _image!.path.isEmpty
                                   ? Image.memory(io.File(_image!.path).readAsBytesSync())
                                   : Image.file(io.File(_image!.path)),
 
