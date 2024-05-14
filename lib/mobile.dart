@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
@@ -18,6 +19,16 @@ class _MobileDashboardState extends State<MobileDashboard> {
   TextEditingController govIdController = TextEditingController();
   TextEditingController fromTimeController = TextEditingController();
   TextEditingController toTimeController = TextEditingController();
+  Future<Uint8List?> pickImage(ImageSource source) async {
+    final ImagePicker _imagePicker = ImagePicker();
+    XFile? _file = await _imagePicker.pickImage(source: source, imageQuality: 50);
+    if (_file != null) {
+      return await _file.readAsBytes();
+    }
+    print('No Images Selected');
+    return null;
+  }
+
 
   // RegExp pattern to match the 12-hour time format
   final RegExp timeRegex = RegExp(
@@ -230,6 +241,10 @@ class _MobileDashboardState extends State<MobileDashboard> {
     govIdController.text = govIdNumber ?? '';
     fromTimeController.text = timingFrom ?? '';
     toTimeController.text = timingTo ?? '';
+    Uint8List? _image;
+
+    // Create _ImagePick widget inside the dialog
+    Widget imagePickerWidget = ImagePick(onImagePicked: (image) => _image = image);
 
     showDialog(
       context: context,
@@ -314,6 +329,10 @@ class _MobileDashboardState extends State<MobileDashboard> {
                     return null;
                   },
                 ),
+
+                ImagePick(onImagePicked: (image) => _image = image), // Add ImagePick widget here
+
+
                 TextFormField(
                   controller: fromTimeController,
                   decoration: InputDecoration(
@@ -362,6 +381,11 @@ class _MobileDashboardState extends State<MobileDashboard> {
                   String updatedGovIdNumber = govIdController.text;
                   String updatedTimingsFrom = fromTimeController.text;
                   String updatedTimingsTo = toTimeController.text;
+                  // If a new image is selected, upload it and get the URL
+                  String imageUrl = '';
+                  if (_image != null) {
+                    imageUrl = await _uploadImageToFirebase(branchId, _image!);
+                  }
 
                   // Update the branch details in Firestore
                   await FirebaseFirestore.instance.collection('branches').doc(branchId).update({
@@ -373,7 +397,11 @@ class _MobileDashboardState extends State<MobileDashboard> {
                     'govIdNumber': updatedGovIdNumber,
                     'timingFrom': updatedTimingsFrom,
                     'timingTo': updatedTimingsTo,
+                    if (imageUrl.isNotEmpty) 'imageUrl': imageUrl, // Add the new image URL if available
+
                   });
+
+
 
                   ScaffoldMessenger.of(context)
                       .showSnackBar(SnackBar(content: Text('Branch details updated successfully')));
@@ -405,7 +433,7 @@ class _MobileDashboardState extends State<MobileDashboard> {
     govIdController.text = govIdNumber ?? '';
     fromTimeController.text = timingFrom ?? '';
     toTimeController.text = timingTo ?? '';
-
+    Uint8List? _image;
     showDialog(
       context: context,
       builder: (context) => SingleChildScrollView(
@@ -429,6 +457,8 @@ class _MobileDashboardState extends State<MobileDashboard> {
                     return null;
                   },
                 ),
+                ImagePick(onImagePicked: (image) => _image = image), // Add ImagePick widget here
+
                 TextFormField(
                   controller: fromTimeController,
                   decoration: InputDecoration(
@@ -444,6 +474,7 @@ class _MobileDashboardState extends State<MobileDashboard> {
                     return null;
                   },
                 ),
+
                 TextFormField(
                   controller: toTimeController,
                   decoration: InputDecoration(
@@ -472,12 +503,15 @@ class _MobileDashboardState extends State<MobileDashboard> {
             ElevatedButton(
               onPressed: () async {
                 if (_formKey.currentState!.validate()) {
+                  String imageUrl = await _uploadImageToFirebase(branchId, _image!);
+
                   // Update status to 'PA' in Firestore
                   await FirebaseFirestore.instance.collection('branches').doc(branchId).update({
                     'status': 'PA',
                     'govIdNumber': govIdController.text,
                     'timingFrom': fromTimeController.text,
                     'timingTo': toTimeController.text,
+                    'imageUrl': imageUrl, // Add image URL to Firestore
                   });
 
                   // Show a snackbar to indicate successful update
@@ -494,11 +528,28 @@ class _MobileDashboardState extends State<MobileDashboard> {
               },
               child: Text('Save'),
             ),
+
           ],
         ),
       ),
     );
   }
+  Future<String> _uploadImageToFirebase(String branchId, Uint8List image) async {
+    // Reference to a location in Firebase Storage
+    Reference storageReference = FirebaseStorage.instance.ref().child('branches/$branchId/image.jpg');
+
+    // Upload the file to Firebase Storage
+    UploadTask uploadTask = storageReference.putData(image);
+
+    // Get the download URL
+    TaskSnapshot taskSnapshot = await uploadTask;
+    String imageUrl = await taskSnapshot.ref.getDownloadURL();
+
+    // Return the download URL
+    return imageUrl;
+  }
+
+
 
   Widget _buildDetailText(String text) {
     return Padding(
@@ -524,10 +575,14 @@ class ImagePick extends StatefulWidget {
   ImagePick({required this.onImagePicked});
 
   @override
-  _ImagePickState createState() => _ImagePickState();
+  _ImagePickState createState() => _ImagePickState(onImagePicked);
 }
 
 class _ImagePickState extends State<ImagePick> {
+  final Function(Uint8List?) onImagePicked;
+
+  _ImagePickState(this.onImagePicked);
+
   Uint8List? _image;
 
   void selectImage() async {
@@ -536,7 +591,7 @@ class _ImagePickState extends State<ImagePick> {
       setState(() {
         _image = img;
       });
-      widget.onImagePicked(_image);
+      onImagePicked(_image); // Call the callback function here
     }
   }
 
@@ -549,7 +604,6 @@ class _ImagePickState extends State<ImagePick> {
     print('No Images Selected');
     return null;
   }
-
   @override
   Widget build(BuildContext context) {
     return Column(
