@@ -127,10 +127,11 @@ class _MobileDashboardState extends State<MobileDashboard> {
             String? govIdNumber = data != null && data.containsKey('govIdNumber')
                 ? data['govIdNumber']
                 : null;
-            String? timingsFrom =
-            data != null && data.containsKey('timingsFrom') ? data['timingsFrom'] : null;
-            String? timingsTo =
-            data != null && data.containsKey('timingsTo') ? data['timingsTo'] : null;
+            String? timingFrom =
+            data != null && data.containsKey('timingFrom') ? data['timingFrom'] : null;
+
+            String? timingTo =
+            data != null && data.containsKey('timingTo') ? data['timingTo'] : null;
             String? status =
             data != null && data.containsKey('status') ? data['status'] : null; // Fetch status
 
@@ -149,11 +150,11 @@ class _MobileDashboardState extends State<MobileDashboard> {
                     _buildDetailText('State: ${snapshot.data!.docs[index]['state']}'),
                     _buildDetailText('Mobile Number: $mobileNumber'),
                     if (govIdNumber != null) _buildDetailText('Government ID: $govIdNumber'),
-                    if (timingsFrom != null) _buildDetailText('Timings From: $timingsFrom'),
-                    if (timingsTo != null) _buildDetailText('Timings To: $timingsTo'),
+                    if (timingFrom != null) _buildDetailText('Timings From: $timingFrom'),
+                    if (timingTo != null) _buildDetailText('Timings To: $timingTo'),
                     if (status != null) _buildDetailText('Status: $status'), // Display status if available
                     if (status == 'BP' &&
-                        (govIdNumber == null || timingsFrom == null || timingsTo == null))
+                        (govIdNumber == null || timingFrom == null || timingTo == null))
                       TextButton(
                         onPressed: () => _openCompleteProfilePopup(
                           context,
@@ -164,15 +165,15 @@ class _MobileDashboardState extends State<MobileDashboard> {
                           snapshot.data!.docs[index]['state'],
                           mobileNumber,
                           govIdNumber,
-                          timingsFrom,
-                          timingsTo,
+                          timingFrom,
+                          timingTo,
                         ),
                         child: Text('Click here to complete profile'),
                       ),
                     if (status == 'PA' &&
                         govIdNumber != null &&
-                        timingsFrom != null &&
-                        timingsTo != null)
+                        timingFrom!= null &&
+                        timingTo != null)
                       ElevatedButton(
                         onPressed: () => _openEditProfilePopup(
                           context,
@@ -183,8 +184,8 @@ class _MobileDashboardState extends State<MobileDashboard> {
                           snapshot.data!.docs[index]['state'],
                           mobileNumber,
                           govIdNumber,
-                          timingsFrom,
-                          timingsTo,
+                          timingFrom,
+                          timingTo,
                           status, // Pass status to edit profile popup
                         ),
                         child: Text('Edit'),
@@ -214,8 +215,8 @@ class _MobileDashboardState extends State<MobileDashboard> {
       String state,
       String mobileNumber,
       String? govIdNumber,
-      String? timingsFrom,
-      String? timingsTo,
+      String? timingFrom,
+      String? timingTo,
       String? status,
       ) {
     final _formKey = GlobalKey<FormState>();
@@ -227,8 +228,8 @@ class _MobileDashboardState extends State<MobileDashboard> {
     TextEditingController mobileNumberController = TextEditingController(text: mobileNumber);
 
     govIdController.text = govIdNumber ?? '';
-    fromTimeController.text = timingsFrom ?? '';
-    toTimeController.text = timingsTo ?? '';
+    fromTimeController.text = timingFrom ?? '';
+    toTimeController.text = timingTo ?? '';
 
     showDialog(
       context: context,
@@ -316,7 +317,7 @@ class _MobileDashboardState extends State<MobileDashboard> {
                 TextFormField(
                   controller: fromTimeController,
                   decoration: InputDecoration(
-                    labelText: 'Timings From',
+                    labelText: 'Timing From',
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -370,8 +371,8 @@ class _MobileDashboardState extends State<MobileDashboard> {
                     'state': updatedState,
                     'mobileNumber': updatedMobileNumber,
                     'govIdNumber': updatedGovIdNumber,
-                    'timingsFrom': updatedTimingsFrom,
-                    'timingsTo': updatedTimingsTo,
+                    'timingFrom': updatedTimingsFrom,
+                    'timingTo': updatedTimingsTo,
                   });
 
                   ScaffoldMessenger.of(context)
@@ -396,14 +397,14 @@ class _MobileDashboardState extends State<MobileDashboard> {
       String state,
       String mobileNumber,
       String? govIdNumber,
-      String? timingsFrom,
-      String? timingsTo,
+      String? timingFrom,
+      String? timingTo,
       ) {
     final _formKey = GlobalKey<FormState>();
 
     govIdController.text = govIdNumber ?? '';
-    fromTimeController.text = timingsFrom ?? '';
-    toTimeController.text = timingsTo ?? '';
+    fromTimeController.text = timingFrom ?? '';
+    toTimeController.text = timingTo ?? '';
 
     showDialog(
       context: context,
@@ -435,7 +436,10 @@ class _MobileDashboardState extends State<MobileDashboard> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter the timings from';
+                      return 'Please enter the timings to';
+                    }
+                    if (!timeRegex.hasMatch(value)) {
+                      return 'Please enter the timings in "hh:mm AM/PM" format';
                     }
                     return null;
                   },
@@ -472,8 +476,8 @@ class _MobileDashboardState extends State<MobileDashboard> {
                   await FirebaseFirestore.instance.collection('branches').doc(branchId).update({
                     'status': 'PA',
                     'govIdNumber': govIdController.text,
-                    'timingsFrom': fromTimeController.text,
-                    'timingsTo': toTimeController.text,
+                    'timingFrom': fromTimeController.text,
+                    'timingTo': toTimeController.text,
                   });
 
                   // Show a snackbar to indicate successful update

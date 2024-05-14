@@ -18,27 +18,23 @@ class DesktopDashboard extends StatefulWidget {
 
 class _DesktopDashboardState extends State<DesktopDashboard> {
   XFile? _image;
-// Declare _image as String to hold the file path
-
   final picker = ImagePicker();
   String selectedItem = '';
-  String selectedBranchName = '';
   Map<String, String> statusFullForms = {
     'BP': 'Branch Pending',
     'PA': 'Pending Approval',
   };
+
   Future getImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     setState(() {
-      _image = pickedFile; // Store the picked file directly
+      _image = pickedFile;
       if (_image == null) {
         print('No image selected.');
       }
     });
   }
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -383,8 +379,8 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
           stateController.text = doc['state'] ?? '';
           mobileController.text = doc['mobileNumber'] ?? '';
           govIdController.text = doc['govIdNumber'] ?? '';
-          fromTimeController.text = doc['timingFrom'] ?? '';
-          toTimeController.text = doc['timingTo'] ?? '';
+          fromTimeController.text = doc['timingsFrom'] ?? '';
+          toTimeController.text = doc['timingsTo'] ?? '';
         });
       }
     });

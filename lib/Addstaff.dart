@@ -4,7 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'config.dart';
-import 'firebase_options.dart'; // Import your configuration file for Firebase options
+import 'firebase_options.dart';
+import 'manage staff.dart'; // Import your configuration file for Firebase options
 
 class FirestoreDropdownService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -141,6 +142,18 @@ class _StaffDetailsFormState extends State<StaffDetailsForm> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Staff Details Form'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.manage_accounts), // Icon for "Manage Staff"
+            onPressed: () {
+              // Navigate to the StaffTable screen
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => StaffTable()),
+              );
+            },
+          ),
+        ],
       ),
       body: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
