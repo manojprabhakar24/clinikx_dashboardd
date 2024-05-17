@@ -1,10 +1,11 @@
-import 'package:clinikx_dashboardd/tablet.dart';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
-import 'desktop.dart';
+import 'branch manage/branchmobile.dart';
+import 'branch manage/clinictable.dart';
 import 'firebase_options.dart';
-import 'mobile.dart';
+
 
 
 void main() async {
@@ -40,7 +41,7 @@ class ResponsiveDashboard extends StatelessWidget {
       body: ResponsiveLayout(
         mobileBody: MobileDashboard(),
         tabletBody: TabletDashboard(),
-        desktopBody: DesktopDashboard(),
+        desktopBody: TabletDashboard(),
       ),
     );
   }
