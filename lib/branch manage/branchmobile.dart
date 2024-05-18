@@ -6,6 +6,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import '../config.dart';
 import '../staff manage/addstaff.dart';
+import 'messages/error_message.dart';
+import 'messages/users_message.dart';
 
 
 class MobileDashboard extends StatefulWidget {
@@ -126,7 +128,7 @@ class _MobileDashboardState extends State<MobileDashboard> {
                   ),
                 ),
               ),
-              Divider(thickness: 1),
+
               _buildDrawerItem('Branch Manage'),
               _buildDrawerItem('Staff Manage'),
               _buildDrawerItem('Appointments'),
@@ -186,7 +188,7 @@ class _MobileDashboardState extends State<MobileDashboard> {
             Positioned.fill(
               child: Center(
                 child: Text(
-                  'Please select an item from the drawer to view details.',
+                  UserMessages.selectItemFromDrawerMessage,
                   style: TextStyle(
                     fontSize: 18,
                     color: Colors.black,
@@ -211,7 +213,7 @@ class _MobileDashboardState extends State<MobileDashboard> {
           return Center(child: CircularProgressIndicator());
         }
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return Center(child: Text('No branches available.'));
+          return Center(child: Text(ErrorMessages.noBranchesAvailable,));
         }
         return ListView.builder(
           itemCount: snapshot.data!.docs.length,
@@ -337,7 +339,7 @@ class _MobileDashboardState extends State<MobileDashboard> {
       context: context,
       builder: (context) => SingleChildScrollView(
         child: AlertDialog(
-          title: Text('Edit Branch Details'),
+          title: Text(UserMessages.editBranchDetails as String),
           content: Form(
             key: _formKey,
             child: Column(
@@ -351,7 +353,7 @@ class _MobileDashboardState extends State<MobileDashboard> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter the branch name';
+                      return ErrorMessages.enterBranchName;
                     }
                     return null;
                   },
@@ -363,7 +365,7 @@ class _MobileDashboardState extends State<MobileDashboard> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter the area';
+                      return ErrorMessages.enterArea;
                     }
                     return null;
                   },
@@ -375,7 +377,7 @@ class _MobileDashboardState extends State<MobileDashboard> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter the city';
+                      return ErrorMessages.enterCity;
                     }
                     return null;
                   },
@@ -387,7 +389,7 @@ class _MobileDashboardState extends State<MobileDashboard> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter the state';
+                      return ErrorMessages.enterState;
                     }
                     return null;
                   },
@@ -399,7 +401,7 @@ class _MobileDashboardState extends State<MobileDashboard> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter the mobile number';
+                      return ErrorMessages.enterMobileNumber;
                     }
                     return null;
                   },
@@ -411,7 +413,7 @@ class _MobileDashboardState extends State<MobileDashboard> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter the government ID number';
+                      return ErrorMessages.enterGovIdNumber;
                     }
                     return null;
                   },
@@ -423,11 +425,14 @@ class _MobileDashboardState extends State<MobileDashboard> {
                 TextFormField(
                   controller: fromTimeController,
                   decoration: InputDecoration(
-                    labelText: 'Timing From',
+                    labelText: 'Timings From (hh:mm AM/PM)',
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter the timings from';
+                      return ErrorMessages.enterTimingFrom;
+                    }
+                    if (!timeRegex.hasMatch(value)) {
+                      return ErrorMessages.invalidTimingFormat;
                     }
                     return null;
                   },
@@ -439,10 +444,10 @@ class _MobileDashboardState extends State<MobileDashboard> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter the timings to';
+                      return ErrorMessages.enterTimingTo;
                     }
                     if (!timeRegex.hasMatch(value)) {
-                      return 'Please enter the timings in "hh:mm AM/PM" format';
+                      return ErrorMessages.invalidTimingFormat;
                     }
                     return null;
                   },
@@ -491,7 +496,7 @@ class _MobileDashboardState extends State<MobileDashboard> {
 
 
                   ScaffoldMessenger.of(context)
-                      .showSnackBar(SnackBar(content: Text('Branch details updated successfully')));
+                      .showSnackBar(SnackBar(content: Text(UserMessages.branchDetailsSavedSuccessfully())));
                   Navigator.pop(context);
                 }
               },
@@ -540,7 +545,7 @@ class _MobileDashboardState extends State<MobileDashboard> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter the government ID number';
+                      return ErrorMessages.enterGovIdNumber;
                     }
                     return null;
                   },
@@ -554,10 +559,10 @@ class _MobileDashboardState extends State<MobileDashboard> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter the timings to';
+                      return ErrorMessages.enterTimingFrom;
                     }
                     if (!timeRegex.hasMatch(value)) {
-                      return 'Please enter the timings in "hh:mm AM/PM" format';
+                      return ErrorMessages.invalidTimingFormat;
                     }
                     return null;
                   },
@@ -570,10 +575,10 @@ class _MobileDashboardState extends State<MobileDashboard> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter the timings to';
+                      return ErrorMessages.enterTimingTo;
                     }
                     if (!timeRegex.hasMatch(value)) {
-                      return 'Please enter the timings in "hh:mm AM/PM" format';
+                      return ErrorMessages.invalidTimingFormat;
                     }
                     return null;
                   },
@@ -603,9 +608,9 @@ class _MobileDashboardState extends State<MobileDashboard> {
                   });
 
                   // Show a snackbar to indicate successful update
-                  ScaffoldMessenger.of(context)
-                      .showSnackBar(SnackBar(content: Text('Profile updated successfully')));
-
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(UserMessages.profileUpdatedSuccessfully)),
+                  );
                   // Update the UI immediately to reflect the new status
                   setState(() {
                     selectedItem = 'Branch Manage'; // Select Branch Manage item to reload the StreamBuilder
@@ -690,7 +695,7 @@ class _ImagePickState extends State<ImagePick> {
     if (_file != null) {
       return await _file.readAsBytes();
     }
-    print('No Images Selected');
+    print(ErrorMessages.noImagesSelected);
     return null;
   }
   @override
@@ -711,7 +716,7 @@ class _ImagePickState extends State<ImagePick> {
               child: Text('Upload Document'),///
             ),
             Text(
-              'Please select a document',
+              ErrorMessages.pleaseSelectDocument,
               style: TextStyle(color: Colors.red),
             ),
           ],

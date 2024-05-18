@@ -1,14 +1,10 @@
-
-
-import 'package:flutter/material.dart';
+import 'package:clinikx_dashboardd/branch%20manage/messages/error_message.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 
-
-
+import '../config.dart';
 import '../staff manage/addstaff.dart';
 import 'BranchDetailsPopup.dart';
-import '../config.dart';
-
 
 class TabletDashboard extends StatefulWidget {
   @override
@@ -16,7 +12,6 @@ class TabletDashboard extends StatefulWidget {
 }
 
 class _TabletDashboardState extends State<TabletDashboard> {
-
   String selectedItem = '';
   String selectedBranchName = '';
   Map<String, String> statusFullForms = {
@@ -37,11 +32,11 @@ class _TabletDashboardState extends State<TabletDashboard> {
           }
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
             return Center(
-              child: Text('No data available'),
+              child: Text(ErrorMessages.noBranchesAvailable),
             );
           }
           var branchData =
-          (snapshot.data!.docs.first.data() as Map<String, dynamic>);
+              (snapshot.data!.docs.first.data() as Map<String, dynamic>);
           String branchName = branchData['clinicName'] ?? '';
           String area = branchData['area'] ?? '';
           String city = branchData['city'] ?? '';
@@ -106,8 +101,10 @@ class _TabletDashboardState extends State<TabletDashboard> {
                     _buildMenuItem('Patients'),
                     _buildMenuItem('Subscription'),
                     Spacer(),
-                    Expanded( // Wrap the Row with Expanded
-                      child: Row( // New Row containing "Powered by" text and logo
+                    Expanded(
+                      // Wrap the Row with Expanded
+                      child: Row(
+                        // New Row containing "Powered by" text and logo
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Text(
@@ -118,26 +115,25 @@ class _TabletDashboardState extends State<TabletDashboard> {
                               fontSize: 14,
                             ),
                           ),
-                          SizedBox(width: 7.1), // Add some spacing between "Powered by" and logo
+                          SizedBox(width: 7.1),
+                          // Add some spacing between "Powered by" and logo
                           Flexible(
                             child: Container(
-                              constraints: BoxConstraints(maxHeight: 160, maxWidth: 200), // Adjust size as needed
+                              constraints:
+                                  BoxConstraints(maxHeight: 160, maxWidth: 200),
+                              // Adjust size as needed
                               child: Image.asset(
                                 AppConfig.matrical,
                                 fit: BoxFit.scaleDown,
                               ),
                             ),
                           )
-
-
-
                         ],
                       ),
                     ),
                   ],
                 ),
               ),
-
 
               Expanded(
                 child: selectedItem == 'Branch Manage'
@@ -151,7 +147,8 @@ class _TabletDashboardState extends State<TabletDashboard> {
                 child: Align(
                   alignment: Alignment.bottomRight,
                   child: Image.asset(
-                    AppConfig.contact, // Replace 'your_image.png' with your image path
+                    AppConfig.contact,
+                    // Replace 'your_image.png' with your image path
                     height: 80, // Adjust the height as needed
                     width: 250, // Adjust the width as needed
                     // Adjust the fit as needed
@@ -159,8 +156,6 @@ class _TabletDashboardState extends State<TabletDashboard> {
                 ),
               ),
             ],
-
-
           );
         },
       ),
@@ -191,7 +186,6 @@ class _TabletDashboardState extends State<TabletDashboard> {
     );
   }
 
-
   Widget _buildBranchDataTable() {
     return StreamBuilder(
       stream: FirebaseFirestore.instance.collection('branches').snapshots(),
@@ -219,8 +213,10 @@ class _TabletDashboardState extends State<TabletDashboard> {
             ),
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minWidth: MediaQuery.of(context).size.width,
+                ),
                 child: DataTable(
                   headingTextStyle: TextStyle(
                     fontWeight: FontWeight.bold,
@@ -298,8 +294,6 @@ class _TabletDashboardState extends State<TabletDashboard> {
                             ),
                           ),
                         ),
-
-
                         DataCell(
                           Text(
                             branch['area'],
@@ -348,15 +342,15 @@ class _TabletDashboardState extends State<TabletDashboard> {
   }
 
   void _showBranchDetailsPopup(
-      BuildContext context,
-      String branchName,
-      String city,
-      String area,
-      String state,
-      String mobileNumber,
-      String branchId,
-      String status,
-      ) {
+    BuildContext context,
+    String branchName,
+    String city,
+    String area,
+    String state,
+    String mobileNumber,
+    String branchId,
+    String status,
+  ) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -372,7 +366,4 @@ class _TabletDashboardState extends State<TabletDashboard> {
       },
     );
   }
-
-
-
 }

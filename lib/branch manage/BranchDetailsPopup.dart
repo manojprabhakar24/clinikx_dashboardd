@@ -7,6 +7,8 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 import 'DocumentViewer.dart';
+import 'messages/error_message.dart';
+import 'messages/users_message.dart';
 
 class BranchDetailsPopup extends StatefulWidget {
   final String branchName;
@@ -138,20 +140,20 @@ class _BranchDetailsPopupState extends State<BranchDetailsPopup> {
 
     // Determine button text based on branch status and editing state
     if (isEditing) {
-      buttonText = 'Edit Branch Details';
+      buttonText = UserMessages.editBranchDetails();
     } else {
       switch (widget.status) {
         case 'BP':
-          buttonText = 'Please click on edit icon and complete your branch profile to get approval';
+          buttonText = UserMessages.branchProfileIncomplete();
           break;
         case 'PA':
-          buttonText = 'Your branch profile is completed.\nPlease wait until your branch gets approval';
+          buttonText = UserMessages.branchProfileCompleted();
           break;
         case 'AA':
-          buttonText = 'View Branch Details';
+          buttonText = UserMessages.viewBranchDetails();
           break;
         default:
-          buttonText = 'View Branch Details';
+          buttonText = UserMessages.viewBranchDetails();
       }
     }
 
@@ -286,7 +288,8 @@ class _BranchDetailsPopupState extends State<BranchDetailsPopup> {
                               .then((_) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                  content: Text('Data updated successfully')),
+                                content: Text(UserMessages.dataUpdatedSuccessfully()),
+                              ),
                             );
                             Navigator.of(context).pop();
 
@@ -296,9 +299,8 @@ class _BranchDetailsPopupState extends State<BranchDetailsPopup> {
                                 context: context,
                                 builder: (BuildContext context) {
                                   return AlertDialog(
-                                    title: Text('Branch Profile Edited'),
-                                    content: Text(
-                                        'Your branch profile is edited successfully.\nPlease wait until you get approval for your                                     branch.'),
+                                    title: Text(UserMessages.branchProfileEditedTitle()),
+                                    content: Text(UserMessages.branchProfileEditedContent()),
                                     actions: <Widget>[
                                       TextButton(
                                         onPressed: () {
@@ -313,8 +315,7 @@ class _BranchDetailsPopupState extends State<BranchDetailsPopup> {
                             }
                           }).catchError((error) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Failed to update data: $error')),
-                            );
+                              SnackBar(content: Text(UserMessages.branchDetailsSaved)),                            );
                           });
                         }
                       },
@@ -355,7 +356,7 @@ class _BranchDetailsPopupState extends State<BranchDetailsPopup> {
       enabled: isEditing,
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return 'Please enter $labelText';
+          return '${ErrorMessages.pleaseEnterValue} $labelText';
         }
         return null;
       },
