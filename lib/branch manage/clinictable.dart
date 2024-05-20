@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../config.dart';
 import '../staff manage/addstaff.dart';
+import '../staff manage/manage_staff.dart';
 import 'BranchDetailsPopup.dart';
 
 class TabletDashboard extends StatefulWidget {
@@ -172,7 +173,7 @@ class _TabletDashboardState extends State<TabletDashboard> {
           // Open the StaffDetailsForm
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => StaffDetailsForm()),
+            MaterialPageRoute(builder: (context) => StaffTable()),
           );
         }
       },

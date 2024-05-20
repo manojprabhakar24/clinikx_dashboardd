@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import '../config.dart';
 import '../staff manage/addstaff.dart';
+import '../staff manage/manage_staff.dart';
 import 'messages/error_message.dart';
 import 'messages/users_message.dart';
 
@@ -169,7 +170,7 @@ class _MobileDashboardState extends State<MobileDashboard> {
     if (selectedItem == 'Branch Manage') {
       return _buildBranchDataTable();
     } else if (selectedItem == 'Staff Manage') {
-      return StaffDetailsForm(); // Display Staff Details Form
+      return StaffTable(); // Display Staff Details Form
     } else {
       return Center(
         child: Stack(
