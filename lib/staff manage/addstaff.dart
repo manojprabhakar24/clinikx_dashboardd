@@ -1,11 +1,11 @@
 import 'dart:io';
-import 'package:clinikx_dashboardd/staff%20manage/viewstaff.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
 
-
+import 'manage_staff.dart';
 
 
 class FirestoreDropdownService {
@@ -60,6 +60,7 @@ class FirestoreService {
         'mobile': mobile,
         'qualification': qualification,
         'about': about,
+        'status': 'AA',
         'createdAt': createdAt,
         'createdBy': createdBy,
         'image': image,
@@ -204,7 +205,7 @@ class _StaffDetailsFormState extends State<StaffDetailsForm> {
                 validator: validateName,
               ),
               SizedBox(height: 10),
-              Row(
+              Column(
                 children: [
                   Expanded(
                     child: _buildTextField(
@@ -213,7 +214,7 @@ class _StaffDetailsFormState extends State<StaffDetailsForm> {
                       validator: validateExperience,
                     ),
                   ),
-                  SizedBox(width: 10),
+                  SizedBox(height: 10),
                   Expanded(
                     child: _buildTextField(
                       mobileController,
@@ -224,7 +225,7 @@ class _StaffDetailsFormState extends State<StaffDetailsForm> {
                 ],
               ),
               SizedBox(height: 10),
-              Row(
+              Column(
                 children: [
                   Expanded(
                     child: _buildDropdownField(
@@ -245,7 +246,7 @@ class _StaffDetailsFormState extends State<StaffDetailsForm> {
                       validator: validateDesignation,
                     ),
                   ),
-                  SizedBox(width: 10),
+                  SizedBox(height: 10),
                   if (specializationEnabled)
                     Expanded(
                       child: _buildDropdownField(
@@ -649,10 +650,12 @@ class _StaffDetailsFormState extends State<StaffDetailsForm> {
 
     setState(() {
       if (pickedFile != null) {
-        _image = pickedFile.path; // Store image path for mobile, URL for web
+        _image = File(pickedFile.path); // Store image path for mobile, URL for web
       } else {
         print('No image selected.');
       }
-    });
+    }
+    );
   }
+
 }

@@ -105,23 +105,23 @@ class _MobileDashboardState extends State<MobileDashboard> {
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         child: Text(
                           ' $clinicName',
-                          style: TextStyle(color: Colors.purpleAccent, fontSize: 18, fontWeight: FontWeight.bold),
+                          style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                       ),
                       SizedBox(height: 8),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 18.0),
                         child: Text(
                           ' $city',
-                          style: TextStyle(color: Colors.purpleAccent, fontSize: 16),
+                          style: TextStyle(color: Colors.black, fontSize: 16),
                         ),
                       ),
                       SizedBox(height: 8),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 18.0),
                         child: Text(
                           ' $state',
-                          style: TextStyle(color: Colors.purpleAccent, fontSize: 16),
+                          style: TextStyle(color: Colors.black, fontSize: 16),
                         ),
                       ),
                     ],
