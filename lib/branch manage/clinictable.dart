@@ -12,7 +12,7 @@ class TabletDashboard extends StatefulWidget {
 }
 
 class _TabletDashboardState extends State<TabletDashboard> {
-  String selectedItem = '';
+  String selectedItem = 'Branch Manage'; // Set default selected item
   String selectedBranchName = '';
   Map<String, String> statusFullForms = {
     'BP': 'Branch Pending',
